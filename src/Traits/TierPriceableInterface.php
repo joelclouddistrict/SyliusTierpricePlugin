@@ -15,7 +15,7 @@ namespace Brille24\SyliusTierPricePlugin\Traits;
 
 use Brille24\SyliusTierPricePlugin\Entity\TierPrice;
 use Sylius\Component\Core\Model\ChannelInterface;
-use Sylius\Component\Customer\Model\CustomerInterface;
+use Sylius\Component\Core\Model\CustomerInterface;
 
 interface TierPriceableInterface
 {

@@ -17,6 +17,7 @@ use Brille24\SyliusTierPricePlugin\Entity\TierPriceInterface;
 use Brille24\SyliusTierPricePlugin\Traits\TierPriceableInterface;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Sylius\Component\Core\Model\ChannelInterface;
+use Sylius\Component\Customer\Model\CustomerGroupInterface;
 
 interface TierPriceRepositoryInterface extends ObjectRepository
 {

@@ -43,6 +43,11 @@ class TierPrice implements ResourceInterface, TierPriceInterface
      */
     private $productVariant;
 
+    /**
+     * @var \DateTime
+     */
+    private $startsAt;
+
     public function __construct(int $quantity = 0, int $price = 0)
     {
         $this->qty   = $quantity;
@@ -107,5 +112,17 @@ class TierPrice implements ResourceInterface, TierPriceInterface
     public function setChannel(?ChannelInterface $channel): void
     {
         $this->channel = $channel;
+    }
+
+    /** {@inheritdoc} */
+    public function getStartsAt(): ?\DateTime
+    {
+        return $this->startsAt;
+    }
+
+    /** {@inheritdoc} */
+    public function setStartsAt(?\DateTime $startsAt): void
+    {
+        $this->startsAt = $startsAt;
     }
 }

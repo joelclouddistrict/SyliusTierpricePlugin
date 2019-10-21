@@ -11,6 +11,7 @@
             </cascade>
             <order-by>
                 <order-by-field name="qty" direction="ASC"/>
+                <order-by-field name="startsAt" direction="DESC"/>
             </order-by>
         </one-to-many>
     </mapped-superclass>

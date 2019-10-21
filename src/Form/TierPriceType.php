@@ -36,6 +36,13 @@ class TierPriceType extends AbstractType
             'currency' => $options['currency'],
         ]);
 
+        $builder->add('startsAt', DateTimeType::class, [
+            'label' => 'sylius.ui.starts_at',
+            'date_widget' => 'single_text',
+            'time_widget' => 'single_text',
+            'required' => false,
+        ]);
+
         $builder->add('channel', ChannelChoiceType::class, [
             'attr' => ['style' => 'display:none'],
         ]);

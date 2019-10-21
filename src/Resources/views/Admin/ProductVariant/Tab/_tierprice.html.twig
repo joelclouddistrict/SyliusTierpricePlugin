@@ -12,6 +12,13 @@
                 {{ form_widget(tierprice.price, {currency: channel.baseCurrency|default('USD')}) }}
                 {{ form_errors(tierprice.price) }}
             </div>
+        </td>
+
+        <td>
+            <div class="field">
+                {{ form_widget(tierprice.startsAt) }}
+                {{ form_errors(tierprice.startsAt) }}
+            </div>
             {{ form_widget(tierprice.channel) }}
         </td>
 
@@ -55,6 +62,7 @@
                 <tr>
                     <th class="table-column-quantity">{{ 'sylius.ui.quantity'|trans }}</th>
                     <th>{{ 'sylius.ui.unit_price'|trans }} </th>
+                    <th>{{ 'sylius.ui.starts_at'|trans }} </th>
                     <th>{{ 'sylius.ui.delete'|trans }}</th>
                 </tr>
                 </thead>

@@ -68,4 +68,14 @@ interface TierPriceInterface
      * @param ChannelInterface|null $channel
      */
     public function setChannel(?ChannelInterface $channel): void;
+
+    /**
+     * @return \DateTime|null
+     */
+    public function getStartsAt(): ?\DateTime;
+
+    /**
+     * @param \DateTime|null $startsAt
+     */
+    public function setStartsAt(?\DateTime $startsAt): void;
 }

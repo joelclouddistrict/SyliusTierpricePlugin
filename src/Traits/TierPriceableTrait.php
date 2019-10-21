@@ -55,11 +55,13 @@ trait TierPriceableTrait
      */
     public function getTierPricesForChannel(ChannelInterface $channel): array
     {
-        return array_filter($this->getTierPrices(), function (TierPriceInterface $tierPrice) use ($channel) {
+        $channelPrices = array_filter($this->getTierPrices(), function (TierPriceInterface $tierPrice) use ($channel) {
             $tierPriceChannel = $tierPrice->getChannel();
 
-            return $tierPriceChannel === null ? false : $tierPriceChannel->getId() === $channel->getId();
+            return $tierPriceChannel !== null && $tierPriceChannel->getId() === $channel->getId();
         });
+
+        return $this->filterPricesWithStartDate($channelPrices);
     }
 
     /**
@@ -71,11 +73,13 @@ trait TierPriceableTrait
      */
     public function getTierPricesForChannelCode(string $code): array
     {
-        return array_filter($this->getTierPrices(), function (TierPriceInterface $tierPrice) use ($code) {
+        $channelPrices = array_filter($this->getTierPrices(), function (TierPriceInterface $tierPrice) use ($code) {
             $tierPriceChannel = $tierPrice->getChannel();
 
-            return $tierPriceChannel === null ? false : $tierPriceChannel->getCode() === $code;
+            return $tierPriceChannel !== null && $tierPriceChannel->getCode() === $code;
         });
+
+        return $this->filterPricesWithStartDate($channelPrices);
     }
 
     /**
@@ -116,5 +120,19 @@ trait TierPriceableTrait
             /** @var TierPriceInterface $tierPrice */
             $this->addTierPrice($tierPrice);
         }
+    }
+
+    /**
+     * @param array                  $tierPrices
+     *
+     * @return TierPriceInterface[]
+     */
+    private function filterPricesWithStartDate(array $tierPrices): array
+    {
+        return array_filter($tierPrices, function (TierPriceInterface $tierPrice) {
+            $now = new \DateTime();
+
+            return $tierPrice->getStartsAt() === null || $tierPrice->getStartsAt() <= $now;
+        });
     }
 }

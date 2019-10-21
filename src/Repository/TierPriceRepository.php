@@ -26,25 +26,22 @@ class TierPriceRepository extends EntityRepository implements TierPriceRepositor
      */
     public function getSortedTierPrices(TierPriceableInterface $productVariant, ChannelInterface $channel): array
     {
-        $qb = $this->createQueryBuilder('tp');
-
         $expr = $this->getEntityManager()->getExpressionBuilder();
-        $qb
-            ->where('productVariant = :productVariant')
-            ->andWhere('channel = :channel')
+
+        return $this->createQueryBuilder('tp')
+            ->where('tp.productVariant = :productVariant')
+            ->andWhere('tp.channel = :channel')
             ->andWhere($expr->orX(
-                'startsAt IS NULL',
-                'startsAt <= :now'
+                'tp.startsAt IS NULL',
+                'tp.startsAt <= :now'
             ))
-            ->orderBy('qty', 'ASC')
-            ->addOrderBy('startsAt', 'DESC')
+            ->orderBy('tp.qty', 'ASC')
+            ->addOrderBy('tp.startsAt', 'DESC')
             ->setParameter('productVariant', $productVariant)
             ->setParameter('channel', $channel)
             ->setParameter('now', new \DateTime())
+            ->getQuery()
+            ->getResult()
         ;
-
-        $query = $qb->getQuery();
-
-        return $query->getResult();
     }
 }

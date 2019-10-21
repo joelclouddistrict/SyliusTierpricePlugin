@@ -19,6 +19,13 @@
                 {{ form_widget(tierprice.startsAt) }}
                 {{ form_errors(tierprice.startsAt) }}
             </div>
+        </td>
+
+        <td>
+            <div class="field">
+                {{ form_widget(tierprice.customerGroup) }}
+                {{ form_errors(tierprice.customerGroup) }}
+            </div>
             {{ form_widget(tierprice.channel) }}
         </td>
 
@@ -63,6 +70,7 @@
                     <th class="table-column-quantity">{{ 'sylius.ui.quantity'|trans }}</th>
                     <th>{{ 'sylius.ui.unit_price'|trans }} </th>
                     <th>{{ 'sylius.ui.starts_at'|trans }} </th>
+                    <th>{{ 'sylius.ui.customer_group'|trans }} </th>
                     <th>{{ 'sylius.ui.delete'|trans }}</th>
                 </tr>
                 </thead>

@@ -17,6 +17,7 @@ use Brille24\SyliusTierPricePlugin\Entity\TierPriceInterface;
 use Brille24\SyliusTierPricePlugin\Traits\TierPriceableInterface;
 use Sylius\Bundle\ResourceBundle\Doctrine\ORM\EntityRepository;
 use Sylius\Component\Core\Model\ChannelInterface;
+use Sylius\Component\Customer\Model\CustomerGroupInterface;
 
 class TierPriceRepository extends EntityRepository implements TierPriceRepositoryInterface
 {
@@ -24,11 +25,11 @@ class TierPriceRepository extends EntityRepository implements TierPriceRepositor
      *
      * @return TierPriceInterface[]
      */
-    public function getSortedTierPrices(TierPriceableInterface $productVariant, ChannelInterface $channel): array
+    public function getSortedTierPrices(TierPriceableInterface $productVariant, ChannelInterface $channel,?CustomerGroupInterface $customerGroup = null): array
     {
         $expr = $this->getEntityManager()->getExpressionBuilder();
 
-        $result = $this->createQueryBuilder('tp')
+        $qb = $this->createQueryBuilder('tp')
             ->where('tp.productVariant = :productVariant')
             ->andWhere('tp.channel = :channel')
             ->andWhere($expr->orX(
@@ -43,6 +44,17 @@ class TierPriceRepository extends EntityRepository implements TierPriceRepositor
             ->getQuery()
             ->getResult()
         ;
+
+        if ($customerGroup instanceof CustomerGroupInterface) {
+            $qb
+                ->andWhere('tp.customerGroup = :customerGroup')
+                ->setParameter('customerGroup', $customerGroup)
+            ;
+        } else {
+            $qb->andWhere('tp.customerGroup IS NULL');
+        }
+
+        $result = $qb->getQuery()->getResult();
 
         // only add first tier found for any quantity
         $qtys = [];

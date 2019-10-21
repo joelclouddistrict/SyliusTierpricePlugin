@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Brille24\SyliusTierPricePlugin\Entity;
 
 use Sylius\Component\Core\Model\ChannelInterface;
+use Sylius\Component\Customer\Model\CustomerGroupInterface;
 use Sylius\Component\Resource\Model\ResourceInterface;
 
 class TierPrice implements ResourceInterface, TierPriceInterface
@@ -47,6 +48,11 @@ class TierPrice implements ResourceInterface, TierPriceInterface
      * @var \DateTime
      */
     private $startsAt;
+
+    /**
+     * @var CustomerGroupInterface
+     */
+    private $customerGroup;
 
     public function __construct(int $quantity = 0, int $price = 0)
     {
@@ -124,5 +130,17 @@ class TierPrice implements ResourceInterface, TierPriceInterface
     public function setStartsAt(?\DateTime $startsAt): void
     {
         $this->startsAt = $startsAt;
+    }
+
+    /** {@inheritdoc} */
+    public function getCustomerGroup(): ?CustomerGroupInterface
+    {
+        return $this->customerGroup;
+    }
+
+    /** {@inheritdoc} */
+    public function setCustomerGroup(?CustomerGroupInterface $customerGroup): void
+    {
+        $this->customerGroup = $customerGroup;
     }
 }

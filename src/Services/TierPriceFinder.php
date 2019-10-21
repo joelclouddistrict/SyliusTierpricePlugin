@@ -35,6 +35,7 @@ class TierPriceFinder implements TierPriceFinderInterface
      * @param TierPriceableInterface $tierPriceableEntity
      * @param ChannelInterface       $channel
      * @param int                    $quantity
+     * @param CustomerInterface      $customer
      *
      * @return TierPriceInterface|null
      */

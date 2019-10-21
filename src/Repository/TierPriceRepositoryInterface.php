@@ -21,12 +21,13 @@ use Sylius\Component\Core\Model\ChannelInterface;
 interface TierPriceRepositoryInterface extends ObjectRepository
 {
     /**
-     * Gets all tier prices for a product variant for a channel with quantity in ascending order
+     * Gets all tier prices for a product variant for a channel and optionally customer group with quantity in ascending order
      *
      * @param TierPriceableInterface    $productVariant
      * @param ChannelInterface          $channel
+     * @param CustomerGroupInterface|null $customerGroup
      *
      * @return TierPriceInterface[]
      */
-    public function getSortedTierPrices(TierPriceableInterface $productVariant, ChannelInterface $channel): array;
+    public function getSortedTierPrices(TierPriceableInterface $productVariant, ChannelInterface $channel, ?CustomerGroupInterface $customerGroup = null): array;
 }

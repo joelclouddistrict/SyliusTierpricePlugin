@@ -17,9 +17,9 @@ use Brille24\SyliusTierPricePlugin\Entity\ProductVariant;
 use Brille24\SyliusTierPricePlugin\Entity\TierPriceInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Sylius\Component\Core\Model\ChannelInterface;
+use Sylius\Component\Core\Model\CustomerInterface;
 use Sylius\Component\Core\Model\ProductVariantInterface;
 use Sylius\Component\Customer\Model\CustomerGroupInterface;
-use Sylius\Component\Customer\Model\CustomerInterface;
 
 /**
  * Trait TierPriceableTrait
@@ -51,7 +51,8 @@ trait TierPriceableTrait
     /**
      * Returns the tier prices only for one channel
      *
-     * @param ChannelInterface $channel
+     * @param ChannelInterface       $channel
+     * @param CustomerInterface|null $customer
      *
      * @return TierPriceInterface[]
      */
@@ -74,7 +75,8 @@ trait TierPriceableTrait
     /**
      * Returns the tier prices only for one channel
      *
-     * @param string $code
+     * @param string                 $code
+     * @param CustomerInterface|null $customer
      *
      * @return TierPriceInterface[]
      */

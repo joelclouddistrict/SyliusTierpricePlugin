@@ -28,7 +28,7 @@ class TierPriceRepository extends EntityRepository implements TierPriceRepositor
     {
         $expr = $this->getEntityManager()->getExpressionBuilder();
 
-        return $this->createQueryBuilder('tp')
+        $result = $this->createQueryBuilder('tp')
             ->where('tp.productVariant = :productVariant')
             ->andWhere('tp.channel = :channel')
             ->andWhere($expr->orX(
@@ -43,5 +43,19 @@ class TierPriceRepository extends EntityRepository implements TierPriceRepositor
             ->getQuery()
             ->getResult()
         ;
+
+        // only add first tier found for any quantity
+        $qtys = [];
+        $prices = [];
+        foreach ($result as $tierPrice) {
+            if (in_array($tierPrice->getQty(), $qtys)) {
+                continue;
+            }
+            $qtys[] = $tierPrice->getQty();
+
+            $prices[] = $tierPrice;
+        }
+
+        return $prices;
     }
 }

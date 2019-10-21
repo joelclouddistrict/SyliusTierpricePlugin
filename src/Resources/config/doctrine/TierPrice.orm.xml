@@ -20,7 +20,7 @@
 
         <many-to-one target-entity="Sylius\Component\Product\Model\ProductVariantInterface" field="productVariant" inversed-by="tierPrices"/>
 
-        <field name="startsAt" type="datetime" column="starts_at" />
+        <field name="startsAt" type="datetime" column="starts_at" nullable="true" />
 
         <unique-constraints>
             <unique-constraint columns="qty,channel_id,productVariant_id,starts_at" name="no_duplicate_prices"/>

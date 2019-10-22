@@ -37,6 +37,7 @@ class TierPriceRepository extends EntityRepository implements TierPriceRepositor
                 'tp.startsAt <= :now'
             ))
             ->orderBy('tp.qty', 'ASC')
+            ->addOrderBy('tp.customerGroup', 'DESC')
             ->addOrderBy('tp.startsAt', 'DESC')
             ->setParameter('productVariant', $productVariant)
             ->setParameter('channel', $channel)

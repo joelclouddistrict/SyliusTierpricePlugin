@@ -47,7 +47,10 @@ class TierPriceRepository extends EntityRepository implements TierPriceRepositor
 
         if ($customerGroup instanceof CustomerGroupInterface) {
             $qb
-                ->andWhere('tp.customerGroup = :customerGroup')
+                ->andWhere($expr->orX(
+                    'tp.customerGroup = :customerGroup',
+                    'tp.customerGroup IS NULL'
+                ))
                 ->setParameter('customerGroup', $customerGroup)
             ;
         } else {

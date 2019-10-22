@@ -64,7 +64,7 @@ trait TierPriceableTrait
             $now = new \DateTime();
             return (
                 $tierPriceChannel !== null &&
-                $tierPriceChannel->getId() === $channel->getId() &&
+                $tierPriceChannel->getCode() === $channel->getCode() &&
                 ($tierPriceChannel->getStartsAt() === null || $tierPriceChannel->getStartsAt() <= $now)
             );
         });
@@ -148,36 +148,44 @@ trait TierPriceableTrait
         if ($customer instanceof CustomerInterface) {
             $group = $customer->getGroup();
         }
-        // Check if there are any tier prices specifically for the passed customer's group
-        $hasGroupPrice = false;
-        if ($group instanceof CustomerGroupInterface) {
-            foreach ($tierPrices as $tierPrice) {
-                if (
-                    $tierPrice->getCustomerGroup() instanceof CustomerGroupInterface &&
-                    $tierPrice->getCustomerGroup()->getId() === $group->getId()
-                ) {
-                    $hasGroupPrice = true;
-                    break;
-                }
-            }
-        }
-        if (!$group instanceof CustomerGroupInterface || !$hasGroupPrice) {
-            /*
-             * We either have no CustomerGroup or there are no tier prices for the specified group so only return
-             * tier prices with no customer group set
-             */
+
+        // CustomerGroup filter not set, return all prices without CustomerGroup
+        if (!$group instanceof CustomerGroupInterface) {
             return array_filter($tierPrices, static function (TierPriceInterface $tierPrice) {
                 return $tierPrice->getCustomerGroup() === null;
             });
         }
+
         /*
-         * We have a customer group and $tierPrices contains tier prices for that specific group so only return
-         * tier prices for that group
+         * Store a preferred price for quantity tier
+         * Prices with the selected customer's group have precedence
          */
-        return array_filter($tierPrices, static function (TierPriceInterface $tierPrice) use ($group) {
-            return
-                $tierPrice->getCustomerGroup() !== null &&
-                $tierPrice->getCustomerGroup()->getId() === $group->getId();
-        });
+        $preferredPrices = [];
+        foreach ($tierPrices as $tierPrice) {
+            // Price for a different CustomerGroup, skip it
+            if (
+                $tierPrice->getCustomerGroup() instanceof CustomerGroupInterface &&
+                $tierPrice->getCustomerGroup()->getCode() !== $group->getCode()
+            ) {
+                continue;
+            }
+
+            $qty = $tierPrice->getQty();
+            if (!isset($preferredPrices[$qty])) {
+                // Price for quantity not set, store the first one found
+                $preferredPrices[$qty] = $tierPrice;
+                continue;
+            }
+
+            // Price already set, but replace it if this one has the selected customer's group
+            if (
+                $tierPrice->getCustomerGroup() instanceof CustomerGroupInterface &&
+                $tierPrice->getCustomerGroup()->getCode() === $group->getCode()
+            ) {
+                $preferredPrices[$qty] = $tierPrice;
+            }
+        }
+
+        return array_values($preferredPrices);
     }
 }

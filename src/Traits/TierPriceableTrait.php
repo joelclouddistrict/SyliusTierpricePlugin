@@ -65,7 +65,7 @@ trait TierPriceableTrait
             return (
                 $tierPriceChannel !== null &&
                 $tierPriceChannel->getCode() === $channel->getCode() &&
-                ($tierPriceChannel->getStartsAt() === null || $tierPriceChannel->getStartsAt() <= $now)
+                ($tierPrice->getStartsAt() === null || $tierPrice->getStartsAt() <= $now)
             );
         });
 
@@ -89,7 +89,7 @@ trait TierPriceableTrait
             return (
                 $tierPriceChannel !== null &&
                 $tierPriceChannel->getCode() === $code &&
-                ($tierPriceChannel->getStartsAt() === null || $tierPriceChannel->getStartsAt() <= $now)
+                ($tierPrice->getStartsAt() === null || $tierPrice->getStartsAt() <= $now)
             );
         });
 
@@ -144,6 +144,12 @@ trait TierPriceableTrait
      */
     private function filterPricesWithCustomerGroup(array $tierPrices, ?CustomerInterface $customer = null): array
     {
+        /*
+         * Return the preferred price for qty and customer group tier
+         * Prices with a closer startsAt date have precedence
+         */
+        $tierPrices = $this->filterPricesWithStartsAt($tierPrices);
+
         $group = null;
         if ($customer instanceof CustomerInterface) {
             $group = $customer->getGroup();
@@ -151,9 +157,9 @@ trait TierPriceableTrait
 
         // CustomerGroup filter not set, return all prices without CustomerGroup
         if (!$group instanceof CustomerGroupInterface) {
-            return array_filter($tierPrices, static function (TierPriceInterface $tierPrice) {
+            return array_values(array_filter($tierPrices, static function (TierPriceInterface $tierPrice) {
                 return $tierPrice->getCustomerGroup() === null;
-            });
+            }));
         }
 
         /*
@@ -187,5 +193,63 @@ trait TierPriceableTrait
         }
 
         return array_values($preferredPrices);
+    }
+
+    /**
+     * @param array $tierPrices
+     *
+     * @return TierPriceInterface[]
+     */
+    private function filterPricesWithStartsAt(array $tierPrices): array
+    {
+        $now = new \DateTime();
+        /*
+         * Store a preferred price for quantity tier and customer group
+         * Prices with startsAt date closer to $now have precedence
+         */
+        $preferredPrices = [];
+        foreach ($tierPrices as $tierPrice) {
+            // Price not available yet, skip it
+            if ($tierPrice->getStartsAt() !== null && $tierPrice->getStartsAt() > $now) {
+                continue;
+            }
+
+            $qty = $tierPrice->getQty();
+            $customerGroup = 0;
+            if ($tierPrice->getCustomerGroup() instanceof CustomerGroupInterface) {
+                $customerGroup = $tierPrice->getCustomerGroup()->getCode();
+            }
+
+
+            if (!isset($preferredPrices[$qty][$customerGroup])) {
+                // Price for quantity and customer group not set, store the first one found
+                $preferredPrices[$qty][$customerGroup] = $tierPrice;
+                continue;
+            }
+
+            if ($tierPrice->getStartsAt() === null) {
+                continue;
+            }
+
+            // Price already set, but replace it if this one has startsAt and the stored one not
+            if ($preferredPrices[$qty][$customerGroup]->getStartsAt() === null) {
+                $preferredPrices[$qty][$customerGroup] = $tierPrice;
+                continue;
+            }
+
+            // Price already set, but replace it if this one has startsAt closer to $now
+            if ($preferredPrices[$qty][$customerGroup]->getStartsAt() < $tierPrice->getStartsAt()) {
+                $preferredPrices[$qty][$customerGroup] = $tierPrice;
+            }
+        }
+
+        $result = [];
+        foreach ($preferredPrices as $preferredPricesForQty) {
+            foreach ($preferredPricesForQty as $preferredPriceForCustomerGroup) {
+                $result[] = $preferredPriceForCustomerGroup;
+            }
+        }
+
+        return $result;
     }
 }

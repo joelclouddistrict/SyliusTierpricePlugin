@@ -41,8 +41,6 @@ class TierPriceRepository extends EntityRepository implements TierPriceRepositor
             ->setParameter('productVariant', $productVariant)
             ->setParameter('channel', $channel)
             ->setParameter('now', new \DateTime())
-            ->getQuery()
-            ->getResult()
         ;
 
         if ($customerGroup instanceof CustomerGroupInterface) {
